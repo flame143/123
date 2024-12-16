@@ -8,7 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f4f4f4;
         }
 
@@ -23,22 +23,29 @@
 
         h1 {
             text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
         }
 
         .controls {
             display: flex;
-            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
             margin-bottom: 20px;
+            justify-content: space-between;
         }
 
         .search-bar input {
-            width: 200px;
+            width: 100%;
+            max-width: 250px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
 
         .categories select {
+            width: 100%;
+            max-width: 250px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -53,6 +60,7 @@
         .movie {
             cursor: pointer;
             text-align: center;
+            transition: transform 0.3s;
         }
 
         .movie img {
@@ -102,7 +110,7 @@
             background: #fff;
             padding: 20px;
             border-radius: 10px;
-            width: 80%;
+            width: 90%;
             max-width: 800px;
         }
 
@@ -133,6 +141,39 @@
             color: red;
             font-weight: bold;
             text-align: center;
+        }
+
+        /* Mobile-friendly adjustments */
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .movie img {
+                height: 250px;
+                object-fit: cover;
+            }
+
+            .pagination button {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .movie img {
+                height: 200px;
+            }
+
+            .pagination button {
+                padding: 6px 10px;
+                font-size: 0.8em;
+            }
         }
     </style>
 </head>
