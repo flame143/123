@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Streaming Embed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .categories select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .movie {
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .movie img {
+            width: 100%;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .movie img:hover {
+            transform: scale(1.05);
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        .pagination button:hover {
+            background-color: #0056b3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            position: relative;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .modal iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f00;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            background: #c00;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stream a Movie</h1>
+
+        <div class="controls">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search for a movie...">
+            </div>
+
+            <div class="categories">
+                <select id="categorySelect">
+                    <option value="popular">Popular</option>
+                    <option value="top_rated">Top Rated</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="now_playing">Now Playing</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="movieGrid" class="movie-grid"></div>
+
+        <div id="pagination" class="pagination"></div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="movieModal" class="modal">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeModal()">Close</button>
+                <iframe id="moviePlayer" src="" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = '2283c405a7e1d26a6b72a786916aad85'; // Your TMDb API Key
+        const movieGrid = document.getElementById('movieGrid');
+        const errorElement = document.getElementById('error');
+        const movieModal = document.getElementById('movieModal');
+        const moviePlayer = document.getElementById('moviePlayer');
+        const searchInput = document.getElementById('searchInput');
+        const categorySelect = document.getElementById('categorySelect');
+        const pagination = document.getElementById('pagination');
+
+        let currentPage = 1;
+        let currentCategory = 'popular';
+        let currentQuery = '';
+
+        async function fetchMovies(category = 'popular', query = '', page = 1) {
+            try {
+                let url = `https://api.themoviedb.org/3/movie/${category}?api_key=${apiKey}&language=en-US&page=${page}`;
+                if (query) {
+                    url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}&language=en-US&page=${page}`;
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    renderMovies(data.results);
+                    renderPagination(data.total_pages, page);
+                } else {
+                    throw new Error('No movies found.');
+                }
+            } catch (error) {
+                errorElement.textContent = 'Failed to fetch movies. Please try again later.';
+                errorElement.style.display = 'block';
+            }
+        }
+
+        function renderMovies(movies) {
+            movieGrid.innerHTML = '';
+            movies.forEach(movie => {
+                const movieElement = document.createElement('div');
+                movieElement.classList.add('movie');
+                movieElement.innerHTML = `
+                    <img src="https://image.tmdb.org/t/p/w200${movie.poster_path}" alt="${movie.title}">
+                    <p>${movie.title}</p>
+                `;
+                movieElement.addEventListener('click', () => selectMovie(movie.id));
+                movieGrid.appendChild(movieElement);
+            });
+        }
+
+        function renderPagination(totalPages, currentPage) {
+            pagination.innerHTML = '';
+            for (let i = 1; i <= Math.min(totalPages, 10); i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.disabled = i === currentPage;
+                button.addEventListener('click', () => {
+                    fetchMovies(currentCategory, currentQuery, i);
+                    currentPage = i;
+                });
+                pagination.appendChild(button);
+            }
+        }
+
+        function selectMovie(movieId) {
+            let embedUrl = `https://vidsrc.xyz/embed/movie?tmdb=${movieId}`;
+            moviePlayer.src = embedUrl;
+            movieModal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            movieModal.style.display = 'none';
+            moviePlayer.src = '';
+        }
+
+        // Event listeners for search and category change
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.trim();
+            if (query.length > 2) {
+                currentQuery = query;
+                currentCategory = 'search';
+                currentPage = 1;
+                fetchMovies('search', query);
+            } else if (query === '') {
+                currentQuery = '';
+                currentCategory = categorySelect.value;
+                currentPage = 1;
+                fetchMovies(categorySelect.value);
+            }
+        });
+
+        categorySelect.addEventListener('change', () => {
+            currentCategory = categorySelect.value;
+            currentQuery = '';
+            currentPage = 1;
+            fetchMovies(categorySelect.value);
+        });
+
+        // Fetch popular movies on page load
+        fetchMovies();
+    </script>
+</body>
+</html>
