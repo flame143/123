@@ -5,177 +5,183 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Streaming Embed</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
 
-        .container {
-            max-width: 1000px;
-            margin: auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+    .container {
+        max-width: 1000px;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-        h1 {
-            text-align: center;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-        }
+    h1 {
+        text-align: center;
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
 
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+        justify-content: space-between;
+    }
+
+    .search-bar input {
+        width: 100%;
+        max-width: 250px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .categories select {
+        width: 100%;
+        max-width: 250px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    .movie {
+        cursor: pointer;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+
+    .movie img {
+        width: 100%;
+        border-radius: 10px;
+        transition: transform 0.3s;
+    }
+
+    .movie img:hover {
+        transform: scale(1.05);
+    }
+
+    .pagination {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .pagination button {
+        padding: 10px 15px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007BFF;
+        color: white;
+        cursor: pointer;
+    }
+
+    .pagination button:hover {
+        background-color: #0056b3;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        position: relative;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 800px;
+    }
+
+    .modal iframe {
+        width: 100%;
+        height: 400px;
+        border: none;
+        border-radius: 10px;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #f00;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .close-btn:hover {
+        background: #c00;
+    }
+
+    .error {
+        color: red;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    /* Mobile-friendly adjustments */
+    @media (max-width: 768px) {
         .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-            justify-content: space-between;
-        }
-
-        .search-bar input {
-            width: 100%;
-            max-width: 250px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .categories select {
-            width: 100%;
-            max-width: 250px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .movie-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-        }
-
-        .movie {
-            cursor: pointer;
-            text-align: center;
-            transition: transform 0.3s;
-        }
-
-        .movie img {
-            width: 100%;
-            border-radius: 10px;
-            transition: transform 0.3s;
-        }
-
-        .movie img:hover {
-            transform: scale(1.05);
-        }
-
-        .pagination {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .pagination button {
-            padding: 10px 15px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007BFF;
-            color: white;
-            cursor: pointer;
-        }
-
-        .pagination button:hover {
-            background-color: #0056b3;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
         }
 
-        .modal-content {
-            position: relative;
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 800px;
+        h1 {
+            font-size: 1.5em;
         }
 
-        .modal iframe {
-            width: 100%;
-            height: 400px;
-            border: none;
-            border-radius: 10px;
+        .movie img {
+            height: 250px;
+            object-fit: cover;
         }
 
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #f00;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
+        .pagination button {
+            padding: 8px 12px;
+            font-size: 0.9em;
         }
 
-        .close-btn:hover {
-            background: #c00;
+        /* 3 grid items per row on mobile */
+        .movie-grid {
+            grid-template-columns: repeat(3, 1fr); /* 3 columns per row */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .movie img {
+            height: 200px;
         }
 
-        .error {
-            color: red;
-            font-weight: bold;
-            text-align: center;
+        .pagination button {
+            padding: 6px 10px;
+            font-size: 0.8em;
         }
+    }
+</style>
 
-        /* Mobile-friendly adjustments */
-        @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            h1 {
-                font-size: 1.5em;
-            }
-
-            .movie img {
-                height: 250px;
-                object-fit: cover;
-            }
-
-            .pagination button {
-                padding: 8px 12px;
-                font-size: 0.9em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .movie img {
-                height: 200px;
-            }
-
-            .pagination button {
-                padding: 6px 10px;
-                font-size: 0.8em;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
